@@ -1,2 +1,0 @@
-# indovina-chi
-Indovina CHI

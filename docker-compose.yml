@@ -1,0 +1,9 @@
+name: indovina-chi
+
+services:
+  app:
+    build: ./app
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./config:/config

@@ -1,0 +1,98 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Reset mobile ───────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  background-color: #0f172a;
+  overscroll-behavior: none;
+}
+
+.safe-area-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+}
+
+/* ── 3D Card Flip ───────────────────────────────────────────────────────── */
+/* Wrapper: aggiunge prospettiva */
+.card-perspective {
+  perspective: 800px;
+}
+
+/* Involucro che ruota */
+.card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
+}
+
+/* Flip attivato (carta eliminata) */
+.card-inner.is-flipped {
+  transform: rotateY(180deg);
+}
+
+/* Entrambe le facce */
+.card-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 0.75rem;   /* rounded-xl */
+  overflow: hidden;
+}
+
+/* Faccia posteriore: ruotata di 180° di default */
+.card-back {
+  transform: rotateY(180deg);
+}
+
+/* ── Animazioni custom ──────────────────────────────────────────────────── */
+@keyframes bounceIn {
+  0%   { transform: translateX(-50%) translateY(-16px) scale(0.9); opacity: 0; }
+  70%  { transform: translateX(-50%) translateY(2px)   scale(1.02); opacity: 1; }
+  100% { transform: translateX(-50%) translateY(0)     scale(1);    opacity: 1; }
+}
+@keyframes slideUp {
+  0%   { transform: translateY(100%); opacity: 0; }
+  100% { transform: translateY(0);    opacity: 1; }
+}
+@keyframes fadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes popIn {
+  0%   { transform: scale(0.8); opacity: 0; }
+  70%  { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); }
+}
+@keyframes scoreFlash {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.6; transform: scale(1.25); }
+}
+
+.animate-bounce-in  { animation: bounceIn  0.30s ease-out forwards; }
+.animate-slide-up   { animation: slideUp   0.25s ease-out forwards; }
+.animate-fade-in    { animation: fadeIn    0.20s ease-out forwards; }
+.animate-pop-in     { animation: popIn     0.35s ease-out forwards; }
+.animate-score-flash { animation: scoreFlash 0.5s ease-in-out; }
+
+/* ── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar       { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
