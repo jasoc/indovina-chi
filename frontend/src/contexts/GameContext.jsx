@@ -1,9 +1,7 @@
 import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import { io } from 'socket.io-client';
 
-const SOCKET_URL =
-  import.meta.env.VITE_SOCKET_URL ||
-  (import.meta.env.PROD ? 'https://blabla.com:443' : `${window.location.protocol}//localhost:3001`);
+const SOCKET_URL = `${window.location.protocol}//${window.location.hostname}:3001`;
 
 const GameContext = createContext(null);
 
