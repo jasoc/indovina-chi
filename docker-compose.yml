@@ -2,7 +2,7 @@ name: indovina-chi
 
 services:
   app:
-    build: ./app
+    build: ./
     ports:
       - "3001:3001"
     volumes:

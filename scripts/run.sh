@@ -1,14 +1,11 @@
 #!/bin/bash
 
-PROJECT_PATH=$(dirname -- "$(readlink -f -- "$0";)";)/../app
+SCRIPT_PATH=$(dirname -- "$(readlink -f -- "$0";)";)
 
 main()
 {
-    cd $PROJECT_PATH
-    if [ ! -d "node_modules" ]; then
-        npm install
-    fi
-    npm run dev
+    "$SCRIPT_PATH/install-deps.sh" "$@"
+    "$SCRIPT_PATH/start.sh" "$@"
 }
 
 main "$@"
