@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 
 // ─── Server URL (stessa logica del socket) ──────────────────────────────────
-const SERVER_URL = `${window.location.protocol}//${window.location.hostname}:3001`;
+const SERVER_URL = import.meta.env.VITE_SOCKET_URL || `${window.location.protocol}//${window.location.hostname}:3001`;
 
 // ─── API helpers ────────────────────────────────────────────────────────────
 async function apiFetchSets() {
