@@ -83,10 +83,5 @@ jobs:
             FRONTEND_IMAGE="ghcr.io/${{ github.repository_owner }}/indovina-chi-frontend"
             SERVER_IMAGE="ghcr.io/${{ github.repository_owner }}/indovina-chi-server"
 
-            SOCKET_URL="${{ vars.SOCKET_URL }}"
-            if [[ -z "$SOCKET_URL" ]]; then
-              SOCKET_URL="https://blabla.com:443"
-            fi
-
-            build_and_push "$FRONTEND_IMAGE" "./frontend" "./frontend/Dockerfile" "--build-arg SOCKET_URL=$SOCKET_URL"
+            build_and_push "$FRONTEND_IMAGE" "./frontend" "./frontend/Dockerfile"
             build_and_push "$SERVER_IMAGE" "./server" "./server/Dockerfile"

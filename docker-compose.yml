@@ -14,8 +14,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-      args:
-        SOCKET_URL: ${SOCKET_URL:-https://blabla.com:443}
+    environment:
+      - VITE_SOCKET_URL=${VITE_SOCKET_URL:-}
     ports:
       - "5173:5173"
     depends_on:
