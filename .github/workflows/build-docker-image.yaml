@@ -67,8 +67,6 @@ jobs:
 
             echo "Building with tags: $TAG_ARGS"
 
-            cd app
-
             # Execute build and push
             docker buildx build \
             --push \
