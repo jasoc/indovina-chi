@@ -36,42 +36,57 @@ jobs:
       # Build and push each service
       - name: Build and push all services
         run: |
-            # Prepare tags
-            TAGS="ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:sha-$(echo ${{ github.sha }} | cut -c1-7)"
+            set -euo pipefail
 
-            # Add version tags if specified
-            if [[ "${{ inputs.version }}" != "" ]]; then
-            VERSION=${{ inputs.version }}
-            TAGS="$TAGS,ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:$VERSION"
-            
-            # Extract major, minor for additional tags
-            MAJOR=$(echo $VERSION | cut -d. -f1)
-            MINOR=$(echo $VERSION | cut -d. -f2)
-            
-            if [[ "$MAJOR" != "" ]]; then
-                TAGS="$TAGS,ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:$MAJOR"
-                
-                if [[ "$MINOR" != "" ]]; then
-                TAGS="$TAGS,ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:$MAJOR.$MINOR"
+            build_and_push() {
+              IMAGE_NAME="$1"
+              CONTEXT_PATH="$2"
+              DOCKERFILE_PATH="$3"
+              BUILD_ARGS="${4:-}"
+
+              TAGS="${IMAGE_NAME}:sha-$(echo ${{ github.sha }} | cut -c1-7)"
+
+              if [[ "${{ inputs.version }}" != "" ]]; then
+                VERSION=${{ inputs.version }}
+                TAGS="$TAGS,${IMAGE_NAME}:$VERSION"
+
+                MAJOR=$(echo "$VERSION" | cut -d. -f1)
+                MINOR=$(echo "$VERSION" | cut -d. -f2)
+
+                if [[ "$MAJOR" != "" ]]; then
+                  TAGS="$TAGS,${IMAGE_NAME}:$MAJOR"
+                  if [[ "$MINOR" != "" ]]; then
+                    TAGS="$TAGS,${IMAGE_NAME}:$MAJOR.$MINOR"
+                  fi
                 fi
+              fi
+
+              if [[ "${{ inputs.latest }}" == "true" ]]; then
+                TAGS="$TAGS,${IMAGE_NAME}:latest"
+              fi
+
+              TAG_ARGS=$(echo "$TAGS" | sed 's/,/ --tag /g')
+
+              echo "Building ${IMAGE_NAME} with tags: $TAG_ARGS"
+
+              docker buildx build \
+                --push \
+                --platform linux/amd64 \
+                --cache-from type=gha \
+                --cache-to type=gha,mode=max \
+                --file "$DOCKERFILE_PATH" \
+                $BUILD_ARGS \
+                --tag $TAG_ARGS \
+                "$CONTEXT_PATH"
+            }
+
+            FRONTEND_IMAGE="ghcr.io/${{ github.repository_owner }}/indovina-chi-frontend"
+            SERVER_IMAGE="ghcr.io/${{ github.repository_owner }}/indovina-chi-server"
+
+            SOCKET_URL="${{ vars.SOCKET_URL }}"
+            if [[ -z "$SOCKET_URL" ]]; then
+              SOCKET_URL="https://blabla.com:443"
             fi
-            fi
 
-            # Add latest tag if requested
-            if [[ "${{ inputs.latest }}" == "true" ]]; then
-            TAGS="$TAGS,ghcr.io/${{ github.repository_owner }}/${{ github.event.repository.name }}:latest"
-            fi
-
-            # Convert comma-separated tag list to --tag arguments for docker build
-            TAG_ARGS=$(echo $TAGS | sed 's/,/ --tag /g')
-
-            echo "Building with tags: $TAG_ARGS"
-
-            # Execute build and push
-            docker buildx build \
-            --push \
-            --platform linux/amd64 \
-            --cache-from type=gha \
-            --cache-to type=gha,mode=max \
-            --tag $TAG_ARGS \
-            ./
+            build_and_push "$FRONTEND_IMAGE" "./frontend" "./frontend/Dockerfile" "--build-arg SOCKET_URL=$SOCKET_URL"
+            build_and_push "$SERVER_IMAGE" "./server" "./server/Dockerfile"

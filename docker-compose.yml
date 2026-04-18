@@ -1,9 +1,22 @@
 name: indovina-chi
 
 services:
-  app:
-    build: ./
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     ports:
       - "3001:3001"
     volumes:
       - ./config:/config
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        SOCKET_URL: ${SOCKET_URL:-https://blabla.com:443}
+    ports:
+      - "5173:5173"
+    depends_on:
+      - server

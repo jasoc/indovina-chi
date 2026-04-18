@@ -1,14 +1,10 @@
 #!/bin/bash
 
 SCRIPT_PATH=$(dirname -- "$(readlink -f -- "$0";)";)
-ROOT_PATH="$SCRIPT_PATH/.."
-FRONTEND_PATH="$ROOT_PATH/frontend"
-SERVER_PATH="$ROOT_PATH/server"
 
 main()
 {
-    cd "$SERVER_PATH"
-    npm start &
+    "$SCRIPT_PATH/start-server.sh" "$@" &
     SERVER_PID=$!
 
     cleanup() {
@@ -17,8 +13,7 @@ main()
 
     trap cleanup EXIT INT TERM
 
-    cd "$FRONTEND_PATH"
-    npm run dev
+    "$SCRIPT_PATH/start-frontend.sh" "$@"
 }
 
 main "$@"
